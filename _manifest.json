@@ -1,0 +1,46 @@
+{
+  "manifest_version": 1,
+  "name": "禁禁你的 | 群聊禁言拓展插件",
+  "version": "2.0.1",
+  "description": "提供通过指定指令禁言的群聊管理插件，纯中文指令，可扩展可配置",
+  "author": {
+    "name": "5i0721",
+    "url": "https://github.com/5i0721"
+  },
+  "license": "MIT",
+  "host_application": {
+    "min_version": "0.7.0"
+  },
+  "repository_url": "https://github.com/5i0721/Ojinjin_need",
+  "keywords": [
+  "mute",
+  "ban",
+  "unmute",
+  "whip",
+  "禁言",
+  "解禁",
+  "鞭尸",
+  "群管理",
+  "群聊管理",
+  "管理员",
+  "admin",
+  "group",
+  "group management",
+  "中文指令",
+  "禁言插件",
+  "群聊工具",
+  "moderation",
+  "punishment",
+  "discipline",
+  "silence",
+  "kick",
+  "control",
+  "权限管理",
+  "黑名单",
+  "白名单",
+  "filter",
+  "指令",
+  "command"
+],
+  "categories": ["Group Management"]
+}
