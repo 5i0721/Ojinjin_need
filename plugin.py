@@ -390,6 +390,84 @@ class WhipCommand(BaseCommand):
             logger.error(f"❌ 鞭尸指令执行异常: {e}", exc_info=True)
             await self.send_text("鞭尸操作出现错误，请查看日志。")
             return False, f"异常: {e}", True
+        
+
+# ==================== 解禁指令 ====================
+
+class UnmuteCommand(BaseCommand):
+    """解禁指令 - 「解禁 @用户」"""
+
+    command_name = "unmute_user"
+    command_description = "解除指定用户的禁言"
+    command_pattern = rf"解禁\s*{_AT_PATTERN}"
+
+    async def execute(self) -> Tuple[bool, Optional[str], bool]:
+        """执行解禁命令"""
+        logger.info("========== 解禁指令触发 ==========")
+
+        try:
+            chat_stream = self.message.chat_stream
+            message_info = self.message.message_info
+
+            # 1. 群聊检查
+            if not chat_stream or not chat_stream.group_info:
+                logger.warning("解禁指令在非群聊环境中被触发")
+                return False, "非群聊环境", True
+
+            group_id: str = str(chat_stream.group_info.group_id)
+            user_id: str = (
+                str(message_info.user_info.user_id)
+                if message_info and message_info.user_info
+                else "unknown"
+            )
+
+            logger.info(f"触发者: {user_id}, 群: {group_id}")
+
+            # 2. 群聊权限检查
+            if not _check_group_access(group_id, self.get_config):
+                logger.info(f"群 {group_id} 未通过群聊过滤，静默忽略")
+                return False, "群未通过过滤", True
+
+            # 3. 用户权限检查
+            if not _check_user_access(user_id, self.get_config):
+                logger.info(f"用户 {user_id} 未通过用户过滤，静默忽略")
+                return False, "用户未通过过滤", True
+
+            # 4. 提取目标QQ
+            target_qq: str = _extract_target_qq(self.matched_groups)
+
+            if not target_qq:
+                logger.error("解禁目标QQ解析失败")
+                await self.send_text("指令格式错误，正确格式：解禁 @用户")
+                return False, "参数解析失败", True
+
+            logger.info(f"解禁目标: {target_qq}, 群: {group_id}")
+
+            # 5. 发送解禁命令（duration=0 即解除禁言）
+            success: bool = await self.send_command(
+                command_name="GROUP_BAN",
+                args={
+                    "qq_id": str(target_qq),
+                    "duration": "0",
+                },
+                display_message=f"解除用户 {target_qq} 的禁言",
+            )
+
+            if success:
+                logger.info(
+                    f"✅ 解禁成功 - 群: {group_id}, 目标: {target_qq}, 操作者: {user_id}"
+                )
+                await self.send_text(f"已解除用户 {target_qq} 的禁言。")
+                return True, f"解禁 {target_qq}", True
+            else:
+                logger.error(f"❌ 解禁命令发送失败 - 群: {group_id}, 目标: {target_qq}")
+                await self.send_text("解禁操作失败，请检查机器人是否有管理员权限。")
+                return False, "解禁命令发送失败", True
+
+        except Exception as e:
+            logger.error(f"❌ 解禁指令执行异常: {e}", exc_info=True)
+            await self.send_text("解禁操作出现错误，请查看日志。")
+            return False, f"异常: {e}", True
 
 
 # ==================== 插件主类 ====================
@@ -418,7 +496,7 @@ class MuteCommandPlugin(BasePlugin):
                 type=bool, default=True, description="是否启用插件"
             ),
             "config_version": ConfigField(
-                type=str, default="2.0.1", description="配置文件版本"
+                type=str, default="2.0.2", description="配置文件版本"
             ),
         },
         "group_filter": {
@@ -482,4 +560,5 @@ class MuteCommandPlugin(BasePlugin):
         return [
             (MuteCommand.get_command_info(), MuteCommand),
             (WhipCommand.get_command_info(), WhipCommand),
+            (UnmuteCommand.get_command_info(), UnmuteCommand),
         ]

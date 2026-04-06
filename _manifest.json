@@ -1,7 +1,7 @@
 {
   "manifest_version": 1,
   "name": "禁禁你的 | 群聊禁言拓展插件",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "description": "提供通过指定指令禁言的群聊管理插件，纯中文指令，可扩展可配置",
   "author": {
     "name": "5i0721",
