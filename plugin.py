@@ -424,7 +424,7 @@ class MuteCommandPlugin(BasePlugin):
         "group_filter": {
             "mode": ConfigField(
                 type=str,
-                default="blacklist",
+                default="whitelist",
                 description="群聊过滤模式：whitelist=只有列表中的群可用（列表为空则所有群可用）；blacklist=列表中的群禁用（列表为空则所有群禁用）",
                 choices=["whitelist", "blacklist"],
             ),
